@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Net Shooter</title>
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- In-game HUD -->
+  <div id="hud" class="hidden">
+    <div class="crosshair" id="crosshair"><span></span><span></span><span></span><span></span></div>
+    <div id="hitmarker"></div>
+    <div class="hud-corner hud-top-left">
+      <div class="hud-label">Mode</div>
+      <div class="hud-value" id="hud-mode">Solo</div>
+    </div>
+    <div class="hud-corner hud-top-right">
+      <div class="hud-label">Targets down</div>
+      <div class="hud-value" id="hud-kills">0</div>
+    </div>
+    <div class="hud-corner hud-bottom-right">
+      <div id="hud-reload" class="hidden">Reloading</div>
+      <div class="ammo"><span id="hud-ammo">30</span><span class="ammo-max">/ <span id="hud-mag">30</span></span></div>
+      <div class="hud-label">R to reload</div>
+    </div>
+  </div>
+
+  <div id="menus">
+    <!-- Main menu -->
+    <section class="screen left" data-screen="main">
+      <div class="menu-panel">
+        <div>
+          <p class="eyebrow">Arena prototype</p>
+          <h1 class="logo">Net<span>Shooter</span></h1>
+        </div>
+        <nav class="menu-list">
+          <button data-action="play">Play</button>
+          <button data-action="settings">Settings</button>
+          <button data-action="controls">Controls</button>
+        </nav>
+        <p class="version">v0.1 · prototype build</p>
+      </div>
+    </section>
+
+    <!-- Mode select -->
+    <section class="screen left" data-screen="mode">
+      <div class="menu-panel">
+        <div>
+          <p class="eyebrow">Play</p>
+          <h2 class="screen-title">Select mode</h2>
+        </div>
+        <div class="mode-cards">
+          <button class="mode-card" data-action="solo">
+            <h3>Solo</h3>
+            <span class="tag">1 player</span>
+            <p>Drop into the training arena and clear the targets on your own.</p>
+          </button>
+          <button class="mode-card" data-action="coop">
+            <h3>Co-op</h3>
+            <span class="tag">2–4 players</span>
+            <p>Browse games hosted over NET, or host your own.</p>
+          </button>
+        </div>
+        <div><button class="btn" data-action="back">Back</button></div>
+      </div>
+    </section>
+
+    <!-- Co-op server browser -->
+    <section class="screen center" data-screen="servers">
+      <div class="panel panel-wide">
+        <header class="panel-head">
+          <p class="eyebrow">Co-op</p>
+          <h2 class="screen-title">Server browser</h2>
+        </header>
+        <div class="panel-body">
+          <div class="browser-toolbar">
+            <input class="input search" type="search" placeholder="Search servers" aria-label="Search servers" data-browser="search">
+            <select class="input region-filter" aria-label="Filter by region" data-browser="region">
+              <option value="">All regions</option>
+            </select>
+            <label class="check"><input type="checkbox" data-browser="hide-full"> Hide full</label>
+            <label class="check"><input type="checkbox" data-browser="hide-empty"> Hide empty</label>
+            <button class="btn" data-browser="refresh">Refresh</button>
+          </div>
+          <div class="table-wrap">
+            <table class="server-table">
+              <thead>
+                <tr>
+                  <th data-sort="name">Server</th>
+                  <th data-sort="region">Region</th>
+                  <th data-sort="map">Map</th>
+                  <th data-sort="players" class="num">Players</th>
+                  <th data-sort="route" title="Whether you would reach the host directly or through a relay node">Route</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <footer class="panel-foot">
+          <span class="browser-status" data-browser="status"></span>
+          <span class="spacer"></span>
+          <button class="btn" data-action="back">Back</button>
+          <button class="btn" data-action="host">Host game</button>
+          <input class="input browser-password hidden" type="password" placeholder="Password" aria-label="Game password" autocomplete="off" data-browser="password">
+          <button class="btn btn-primary" data-browser="join" disabled>Join</button>
+        </footer>
+      </div>
+    </section>
+
+    <!-- Host game -->
+    <section class="screen center" data-screen="host">
+      <form class="panel panel-narrow" data-host-form>
+        <header class="panel-head">
+          <p class="eyebrow">Co-op</p>
+          <h2 class="screen-title">Host a game</h2>
+        </header>
+        <div class="panel-body form">
+          <label class="field">
+            <span class="field-label">Server name</span>
+            <input class="input" type="text" name="name" value="My co-op game" maxlength="32" required>
+          </label>
+          <div class="field">
+            <span class="field-label">Max players</span>
+            <div class="segmented">
+              <label><input type="radio" name="maxPlayers" value="2"><span>2</span></label>
+              <label><input type="radio" name="maxPlayers" value="3"><span>3</span></label>
+              <label><input type="radio" name="maxPlayers" value="4" checked><span>4</span></label>
+            </div>
+          </div>
+          <div class="field-row">
+            <label class="field">
+              <span class="field-label">Map</span>
+              <select class="input" name="map"><option>Warehouse</option></select>
+            </label>
+            <label class="field">
+              <span class="field-label">Region tag</span>
+              <select class="input" name="region" data-region-options></select>
+            </label>
+          </div>
+          <p class="field-hint">The region tag is a label players can filter by. It doesn't affect connection speed.</p>
+          <label class="field">
+            <span class="field-label">Password <em>optional</em></span>
+            <input class="input" type="password" name="password" placeholder="Leave empty for a public game" autocomplete="off">
+          </label>
+          <label class="check"><input type="checkbox" name="friendlyFire"> Friendly fire</label>
+        </div>
+        <footer class="panel-foot">
+          <span class="spacer"></span>
+          <button type="button" class="btn" data-action="back">Cancel</button>
+          <button type="submit" class="btn btn-primary">Start hosting</button>
+        </footer>
+      </form>
+    </section>
+
+    <!-- Settings -->
+    <section class="screen center" data-screen="settings">
+      <div class="panel panel-narrow">
+        <header class="panel-head">
+          <p class="eyebrow">Options</p>
+          <h2 class="screen-title">Settings</h2>
+        </header>
+        <div class="panel-body">
+          <label class="setting setting-text">
+            <span>Player name</span>
+            <input class="input" type="text" name="playerName" maxlength="24" autocomplete="off" spellcheck="false">
+          </label>
+          <label class="setting">
+            <span>Mouse sensitivity</span>
+            <input type="range" name="sensitivity" min="0.2" max="3" step="0.1">
+            <output></output>
+          </label>
+          <label class="setting">
+            <span>Field of view</span>
+            <input type="range" name="fov" min="60" max="110" step="1">
+            <output></output>
+          </label>
+          <label class="setting">
+            <span>Volume</span>
+            <input type="range" name="volume" min="0" max="100" step="1">
+            <output></output>
+          </label>
+        </div>
+        <footer class="panel-foot">
+          <span class="spacer"></span>
+          <button class="btn btn-primary" data-action="back">Done</button>
+        </footer>
+      </div>
+    </section>
+
+    <!-- Controls -->
+    <section class="screen center" data-screen="controls">
+      <div class="panel panel-narrow">
+        <header class="panel-head">
+          <p class="eyebrow">Options</p>
+          <h2 class="screen-title">Controls</h2>
+        </header>
+        <div class="panel-body controls-list">
+          <div><span>Move</span><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span></div>
+          <div><span>Look</span><span><kbd>Mouse</kbd></span></div>
+          <div><span>Fire</span><span><kbd>Left click</kbd></span></div>
+          <div><span>Aim down sights</span><span><kbd>Right click</kbd></span></div>
+          <div><span>Reload</span><span><kbd>R</kbd></span></div>
+          <div><span>Sprint</span><span><kbd>Shift</kbd></span></div>
+          <div><span>Jump</span><span><kbd>Space</kbd></span></div>
+          <div><span>Pause</span><span><kbd>Esc</kbd></span></div>
+        </div>
+        <footer class="panel-foot">
+          <span class="spacer"></span>
+          <button class="btn btn-primary" data-action="back">Done</button>
+        </footer>
+      </div>
+    </section>
+
+    <!-- Pause -->
+    <section class="screen center" data-screen="pause">
+      <div class="menu-panel">
+        <div>
+          <p class="eyebrow" id="pause-mode">Solo</p>
+          <h2 class="screen-title">Paused</h2>
+        </div>
+        <nav class="menu-list">
+          <button data-action="resume">Resume</button>
+          <button data-action="settings">Settings</button>
+          <button data-action="controls">Controls</button>
+          <button data-action="quit" class="danger">Quit to main menu</button>
+        </nav>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

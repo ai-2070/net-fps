@@ -1,0 +1,16 @@
+{
+  "name": "net-shooter",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs"
+  },
+  "dependencies": {
+    "@net-mesh/browser": "0.40.0",
+    "three": "0.160.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
