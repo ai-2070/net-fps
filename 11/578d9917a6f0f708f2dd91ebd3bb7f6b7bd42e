@@ -1,0 +1,23 @@
+README.md
+  s_297e9db2706ffd::t_df94ab1b3cb69d 3,18
+package-lock.json
+  s_297e9db2706ffd::t_32e3590df3b5f2 9,459-460
+package.json
+  s_297e9db2706ffd::t_86d10328a96292 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "11578d9917a6f0f708f2dd91ebd3bb7f6b7bd42e",
+  "prompts": {},
+  "sessions": {
+    "s_297e9db2706ffd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dab5b01d-0706-4dfe-98fa-eb10fb0b8d32",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "LZL0 <12474488+LZL0@users.noreply.github.com>"
+    }
+  }
+}
