@@ -7,7 +7,7 @@
     "build": "node scripts/build.mjs"
   },
   "dependencies": {
-    "@net-mesh/browser": "0.44.1",
+    "@net-mesh/browser": "0.45.0",
     "three": "0.186.1"
   },
   "devDependencies": {
