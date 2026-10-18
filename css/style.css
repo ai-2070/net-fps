@@ -29,6 +29,7 @@ html, body {
 #game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
 
 button { font: inherit; color: inherit; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
 .hidden { display: none !important; }
 
 /* ---------- Menus ---------- */
@@ -479,3 +480,67 @@ kbd {
 .browser-password { width: 150px; }
 .browser-password.hidden { display: none; }
 .setting-text .input { grid-column: span 2; }
+
+/* ---------- Network debug panel (F4, see js/netdebug.js) ---------- */
+.net-debug {
+  position: fixed; top: 12px; right: 12px; z-index: 1000;
+  max-width: calc(100vw - 24px); max-height: calc(100vh - 24px); overflow: auto;
+  padding: 10px 12px; border: 1px solid #2d352c; border-radius: 2px;
+  background: rgba(0, 0, 0, 0.84); color: #d4dcd0;
+  font: 11px/1.45 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  pointer-events: none;
+}
+.net-debug pre { font: inherit; white-space: pre; }
+.net-debug .net-map { display: block; width: 100%; margin-top: 10px; border: 1px solid #2d352c; border-radius: 2px; }
+.net-debug b { color: #c4ff3d; font-weight: 600; letter-spacing: 0.08em; }
+.net-debug i { color: #6b7568; font-style: normal; }
+.net-debug .ok { color: #c4ff3d; }
+.net-debug .warn { color: #e0b44a; }
+
+/* ---------- NET: this game is its demo (beside the main menu) ----------
+   In NET's own look (ai2070.net): JetBrains Mono, black, lime; its packet rain
+   behind (see js/netrain.js) */
+.menu-side { margin-left: auto; display: flex; flex-direction: column; justify-content: center; gap: 18px; width: min(520px, 100%); flex: none; }
+.net-card {
+  --net-bg: #000; --net-text: #d4dcd0; --net-muted: #6b7568; --net-lime: #c4ff3d; --net-dim: #6b8a1e;
+  --net-line: #2d352c; --net-line-dark: #1a1f1a; --net-ink: #0a0c0a;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  position: relative; overflow: hidden; isolation: isolate;
+  display: flex; flex-direction: column; gap: 12px; width: 100%;
+  padding: 16px 18px 18px; border: 1px solid var(--net-line); border-radius: 2px;
+  background: rgba(0, 0, 0, 0.88);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(196, 255, 61, 0.04);
+}
+.net-rain { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.32;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.35) 55%, transparent 100%); mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.35) 55%, transparent 100%); }
+.net-card-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; white-space: nowrap; }
+.net-live { display: inline-flex; align-items: center; gap: 7px; color: var(--net-lime); }
+.net-live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--net-lime); box-shadow: 0 0 8px var(--net-lime); animation: net-blink 1.6s ease-in-out infinite; }
+.net-tag { padding: 3px 7px; border: 1px solid var(--net-lime); color: var(--net-lime); }
+.net-card-title { margin-top: 8px; color: var(--net-text); font-size: 26px; font-weight: 300; line-height: 1.12; letter-spacing: -0.01em; text-transform: uppercase; }
+.net-card-title em { font-style: normal; color: var(--net-lime); }
+.net-card-body { color: var(--net-text); opacity: 0.82; font-size: 13px; line-height: 1.55; }
+/* (F4: the network debug panel, see js/netdebug.js) */
+.net-card-hint { color: var(--net-muted); font-size: 11px; letter-spacing: 0.4px; }
+.net-card kbd {
+  display: inline-block; padding: 1px 6px; margin-right: 2px;
+  border: 1px solid var(--net-lime); border-radius: 2px; color: var(--net-lime);
+  font: 600 10px/1.4 'JetBrains Mono', ui-monospace, monospace; letter-spacing: 0.5px;
+}
+.net-card-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.net-btn {
+  flex: 1 1 auto; padding: 10px 14px; text-align: center;
+  border: 1px solid var(--net-lime); border-radius: 0; color: var(--net-lime); background: rgba(0, 0, 0, 0.6);
+  font-size: 11px; font-weight: 600; letter-spacing: 0.88px; text-transform: uppercase;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.net-btn:hover, .net-btn:focus-visible { background: rgba(196, 255, 61, 0.12); box-shadow: 0 0 18px rgba(196, 255, 61, 0.25); }
+.net-btn.primary { background: var(--net-lime); color: var(--net-ink); }
+.net-btn.primary:hover, .net-btn.primary:focus-visible { background: #d6ff73; }
+@keyframes net-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .net-live::before { animation: none; } }
+/* (narrow or short: the card under the menu, not beside it) */
+@media (max-width: 1100px), (max-height: 600px) {
+  .screen[data-screen="main"] { flex-direction: column; justify-content: safe center; align-items: flex-start; gap: 24px; overflow-y: auto; }
+  .screen .menu-side { margin-left: 0; width: min(520px, 100%); }
+}

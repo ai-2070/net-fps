@@ -3,6 +3,8 @@ import { Hud } from './hud.js';
 import { Sound } from './audio.js';
 import { UI } from './ui.js';
 import { toast } from './toast.js';
+import { NetDebug } from './netdebug.js';
+import { startNetRain } from './netrain.js';
 
 const SETTINGS_KEY = 'net-shooter-settings';
 const DEFAULT_SETTINGS = { sensitivity: 1, fov: 80, volume: 60, playerName: `Player ${Math.floor(Math.random() * 900) + 100}` };
@@ -37,7 +39,8 @@ let connecting = false;
 
 // NET loads only when co-op is opened, so solo never depends on it
 let netModule = null;
-const loadNet = () => (netModule ??= import('./net.js').catch((error) => {
+let netApi = null; // (net.js once loaded: for the F4 panel)
+const loadNet = () => (netModule ??= import('./net.js').then((net) => (netApi = net)).catch((error) => {
   netModule = null;
   throw new Error(`Couldn't load NET: ${error.message ?? error}`);
 }));
@@ -60,6 +63,7 @@ const ui = new UI({
     startCoop((net) => net.joinGame({ listing: server.listing, name: playerName(), password, onStatus: toast })),
 });
 ui.show('main');
+startNetRain(); // (the NET card's packet rain, see js/netrain.js)
 
 function lockPointer() {
   try {
@@ -155,6 +159,20 @@ window.addEventListener('pagehide', () => session?.leave());
 
 // Connection details for the devtools console
 window.netDebug = () => session?.debug();
+
+// F4: the network debug panel (js/netdebug.js), anywhere: the frame rate,
+// NET, this node, and in co-op each link with its latency and traffic. It
+// never loads NET itself: in solo it says NET isn't loaded.
+const netPanel = new NetDebug({
+  net: () => netApi,
+  session: () => session,
+  player: playerName,
+});
+document.addEventListener('keydown', (e) => {
+  if (e.code !== 'F4' || e.repeat || e.altKey) return;
+  e.preventDefault();
+  netPanel.toggle();
+});
 
 // Fallback if the lock request was ignored without an error
 canvas.addEventListener('click', () => {

@@ -7,7 +7,7 @@
   <link rel="icon" href="data:,">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -46,6 +46,20 @@
           <button data-action="controls">Controls</button>
         </nav>
         <p class="version">v0.1 · prototype build</p>
+      </div>
+      <!-- The game's co-op runs on NET: the mesh, animated, and where to get it -->
+      <div class="menu-side">
+        <div class="net-card">
+          <canvas class="net-rain" aria-hidden="true"></canvas>
+          <div class="net-card-top"><span class="net-live">Built on NET</span><span class="net-tag">🔒 E2E secure</span></div>
+          <p class="net-card-title">Multiplayer powered by <em>NET.</em></p>
+          <p class="net-card-body">Every co-op game is peer-to-peer and encrypted end to end: no game server, the host's browser runs the match and every player links straight to it over NET's mesh. Add the same multiplayer to your own web game.</p>
+          <p class="net-card-hint"><kbd>F4</kbd> in co-op: watch the mesh live</p>
+          <div class="net-card-actions">
+            <a class="net-btn primary" href="https://ai2070.net" target="_blank" rel="noopener noreferrer">↗ Explore NET</a>
+            <a class="net-btn" href="https://ai2070.net/docs/sdk/browser/quickstart" target="_blank" rel="noopener noreferrer">Add NET to your game</a>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -211,6 +225,7 @@
           <div><span>Sprint</span><span><kbd>Shift</kbd></span></div>
           <div><span>Jump</span><span><kbd>Space</kbd></span></div>
           <div><span>Pause</span><span><kbd>Esc</kbd></span></div>
+          <div><span>Network debug</span><span><kbd>F4</kbd></span></div>
         </div>
         <footer class="panel-foot">
           <span class="spacer"></span>

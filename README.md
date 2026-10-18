@@ -22,6 +22,7 @@ Other options:
 - `?anchor=https://…` on the page URL: use a different anchor than the public one.
 - `ANCHOR_STATS=1`, `ANCHOR_VERBOSE=1|2|3`: anchor diagnostics.
 - `netDebug()` in the devtools console: this player's connection details.
+- <kbd>F4</kbd>, anywhere: the network debug panel (see [Network debug panel](#network-debug-panel-f4)).
 
 Use a regular browser. Embedded editor previews may block WebRTC.
 
@@ -47,11 +48,12 @@ three.js and NET are pinned npm dependencies (Renovate keeps them current); only
 | Sprint | Shift |
 | Jump | Space |
 | Pause | Esc |
+| Network debug panel | F4 |
 
 ## What's in it
 
 - **Solo:** a walled arena with crates and cover, plus eight target dummies that patrol, take damage (headshots do double), and respawn three seconds after they go down.
-- **Menus:** main menu, mode select (Solo / Co-op), settings (player name, sensitivity, FOV, volume, saved in `localStorage`), controls, and a pause menu (Resume, Settings, Controls, Quit to main menu). Esc steps back out of sub-menus.
+- **Menus:** main menu, mode select (Solo / Co-op), settings (player name, sensitivity, FOV, volume, saved in `localStorage`), controls, and a pause menu (Resume, Settings, Controls, Quit to main menu). Esc steps back out of sub-menus. Beside the main menu, a card on NET, in NET's own look, with links to its site and its browser quickstart.
 - **Co-op over [NET](https://ai2070.net/docs), 2–4 players:**
   - **Host game** opens a NET lobby with the form's settings: server name, max players (2–4), map, region tag, optional password and friendly fire. Everything but the password and friendly fire shows in the server browser; a password marks the game locked.
   - **Server browser** lists open games with NET's `listLobbies`, with columns for server, region, map, players and route. Search matches server names; the region dropdown, Hide full and Hide empty filter the list; column headers sort it; Refresh fetches it again. If NET can't be reached, the list says why and the status reads "Not connected to NET".
@@ -66,6 +68,25 @@ three.js and NET are pinned npm dependencies (Renovate keeps them current); only
   How the browser maps to NET:
   - **Region** is a label the host picks from a fixed list (EU West, EU East, NA East, NA West, South America, Asia, Oceania). NET doesn't measure it, so it's only a category to filter by, not a speed hint. The host form says so under the field.
   - **Route** replaces a ping column. NET reports whether the path to a peer is direct or relayed through another node. A listing has no route or round-trip figure until you've joined, so the browser shows "—". The round trip in the pause menu comes from the netcode clock once connected.
+
+## Network debug panel (F4)
+
+Press <kbd>F4</kbd> at any time, and again to close it. The panel shows NET as it runs, in your own browser, for debugging your connection or your own NET game built from this one. It's the same panel as in [Rose & Blade](https://danielv8.itch.io/rose-and-blade), adapted to this game, where players connect to the host and not to each other.
+
+- **NET DEBUG:** the frame rate (frames a second, the average and slowest frame time), the anchor, and this page's node id and whether its session with the anchor is up. In solo NET isn't loaded, and the panel says so; opening it never loads NET.
+- **GAME:** in co-op, the game's name and your role. The host sees its netcode tick and any dropped frames. A player sees snapshots received (late, partial), prediction corrections and inputs not yet acknowledged.
+- **Links:** one row per link (the host has one per player, a player has one to the host): direct (WebRTC) or relayed through the anchor, with the reason in brackets if the direct attempt ended (ice timeout, udp blocked, failed). Then the latency (NET's netcode clock: the median round trip) and jitter, ms since the peer was last heard, and kB/s each way. "All told" is the traffic since the link was first used.
+- **The map:** every player is a node, and the shorter the round trip, the closer two nodes sit. Direct links are lime, relayed ones dashed amber. Your own links are bright, with a packet moving along them.
+- **NODE / RTC:** NET's own counters (`node.counters()`, `node.rtcStats()`), the ones that aren't zero.
+
+How it gets the numbers (`js/net.js`, under "For the network debug panel"):
+
+- **Traffic** is counted on the node itself: its `openStream` and each stream's `send` are wrapped, and incoming `stream_data` events are counted per peer. That covers movement and the lobby store alike.
+- **Latency:** a player has NET's netcode clock to the host (`stats().clock`). The host has no clock of its own, so every player reports its round trip with an input about once a second (twice a second while its panel is open), and the host's panel shows that.
+- **The links** come from `peerAttempt`, read every half second while the panel is open.
+- **A player's map** shows only its own link at first. When a player's panel is open, its reports say so, and the host adds a `net:links` entity to its snapshots, with each player's link and round trip, so that player's map shows the whole game. When no panel is open, the host stops sending it, about 3 s later.
+
+The panel only reads. Opening it changes nothing in the game, apart from those small reports and the `net:links` entity.
 
 ## How co-op uses NET
 
@@ -129,6 +150,8 @@ js/ui.js            menu screen stack, settings, host form
 js/hud.js           HUD: ammo, kills, hit marker
 js/audio.js         synthesized sound effects (Web Audio)
 js/toast.js         notification toast
+js/netdebug.js      the network debug panel (F4)
+js/netrain.js       the NET card's packet rain, beside the main menu
 
 scripts/build.mjs   npm run build: the game into dist/
 scripts/dev.mjs     npm start: build and watch, HTTPS page server, optional local NET anchor
