@@ -1,6 +1,6 @@
 # Net Shooter
 
-A small first-person shooter prototype built with [three.js](https://threejs.org/), with online co-op over [NET](https://ai2070.net/docs) (`@net-mesh/browser` 0.41.1).
+A small first-person shooter prototype built with [three.js](https://threejs.org/), with online co-op over [NET](https://ai2070.net/docs) (`@net-mesh/browser` 0.45.0).
 
 ## Running
 
@@ -15,7 +15,7 @@ Co-op needs a NET anchor, which introduces players' browsers to each other. By d
 
 One-time setup for `npm start`: **mkcert**, for a certificate your browser trusts. `winget install FiloSottile.mkcert` (or `brew install mkcert`), then `mkcert -install`.
 
-To run your own anchor instead, `npm start -- --local-anchor` starts one on :8444 and prints a page URL with `?anchor=` pointing at it. It needs a `net-mesh` with the anchor feature: download `net-mesh-anchor-v0.41.1-<platform>` from the [NET release](https://github.com/ai-2070/net/releases/tag/v0.41.1) (x86_64 Linux and Windows), or build it with `cargo install net-cli --features rtc-bootstrap`. Put it at `.anchor/bin/net-mesh(.exe)`, or set `NET_MESH_BIN`. The first run fills `.anchor/` with the mesh key, the credential issuer key and the certificate. It's git-ignored; keep it private.
+To run your own anchor instead, `npm start -- --local-anchor` starts one on :8444 and prints a page URL with `?anchor=` pointing at it. It needs a `net-mesh` with the anchor feature: download `net-mesh-anchor-v0.45.0-<platform>` from the [NET release](https://github.com/ai-2070/net/releases/tag/v0.45.0) (x86_64 Linux and Windows), or build it with `cargo install net-cli --features rtc-bootstrap`. Put it at `.anchor/bin/net-mesh(.exe)`, or set `NET_MESH_BIN`. The first run fills `.anchor/` with the mesh key, the credential issuer key and the certificate. It's git-ignored; keep it private.
 
 Other options:
 - `npm start -- --host <LAN IP>`: play across your LAN. Other machines must trust your mkcert CA.
@@ -133,3 +133,7 @@ js/toast.js         notification toast
 scripts/build.mjs   npm run build: the game into dist/
 scripts/dev.mjs     npm start: build and watch, HTTPS page server, optional local NET anchor
 ```
+
+## License
+
+[MIT](LICENSE). Use it, fork it, ship it. three.js and NET keep their own licenses (NET is MIT or Apache-2.0).
