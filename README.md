@@ -1,6 +1,22 @@
 # Net Shooter
 
-A small first-person shooter prototype built with [three.js](https://threejs.org/), with online co-op over [NET](https://ai2070.net/docs) (`@net-mesh/browser` 0.45.0).
+[![Play in the browser](https://img.shields.io/badge/play-net--fps.vercel.app-c4ff3d?style=flat-square)](https://net-fps.vercel.app)
+[![NET](https://img.shields.io/github/package-json/dependency-version/ai-2070/net-fps/%40net-mesh%2Fbrowser?style=flat-square&label=NET)](https://ai2070.net/docs)
+[![three.js](https://img.shields.io/github/package-json/dependency-version/ai-2070/net-fps/three?style=flat-square&label=three.js)](https://threejs.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+
+An open-source first-person shooter that runs in the browser, with **peer-to-peer multiplayer co-op** over [NET](https://ai2070.net/docs) (`@net-mesh/browser` 0.45.1) and WebRTC. There's no game server: the host's browser runs the match, every player links straight to it, and the traffic is end-to-end encrypted. It's built with [three.js](https://threejs.org/) and plain JavaScript, and it's meant as a working example to copy from when you add multiplayer to your own web game.
+
+**[▶ Play it in your browser](https://net-fps.vercel.app)** · [NET docs](https://ai2070.net/docs) · [NET browser quickstart](https://ai2070.net/docs/sdk/browser/quickstart)
+
+![Three-player co-op match in Net Shooter, with the F4 network debug panel open: direct WebRTC links, 1 ms latency, traffic per player, a live mesh map and NET's counters](docs/screenshots/coop-net-debug.png)
+
+- **Browser multiplayer with no backend:** a static site plus NET's public anchor, which introduces players and relays only when a direct link can't be made.
+- **Host-authoritative netcode** at 30 Hz, with client-side prediction, reconciliation and interpolation (NET's `hostNetcode` / `joinNetcode`).
+- **Lag compensation:** the host decides hits against what the shooter saw when they fired (`rewind`).
+- **Server browser** over NET lobbies, with search, region filter, sorting, password-locked games and 2–4 players.
+- **F4 network debug panel:** link type, latency, jitter and traffic per player, a live mesh map, and NET's own counters.
+- **Solo never loads NET:** the networking code is a separate chunk, loaded when co-op opens.
 
 ## Running
 
@@ -15,7 +31,7 @@ Co-op needs a NET anchor, which introduces players' browsers to each other. By d
 
 One-time setup for `npm start`: **mkcert**, for a certificate your browser trusts. `winget install FiloSottile.mkcert` (or `brew install mkcert`), then `mkcert -install`.
 
-To run your own anchor instead, `npm start -- --local-anchor` starts one on :8444 and prints a page URL with `?anchor=` pointing at it. It needs a `net-mesh` with the anchor feature: download `net-mesh-anchor-v0.45.0-<platform>` from the [NET release](https://github.com/ai-2070/net/releases/tag/v0.45.0) (x86_64 Linux and Windows), or build it with `cargo install net-cli --features rtc-bootstrap`. Put it at `.anchor/bin/net-mesh(.exe)`, or set `NET_MESH_BIN`. The first run fills `.anchor/` with the mesh key, the credential issuer key and the certificate. It's git-ignored; keep it private.
+To run your own anchor instead, `npm start -- --local-anchor` starts one on :8444 and prints a page URL with `?anchor=` pointing at it. It needs a `net-mesh` with the anchor feature: download `net-mesh-anchor-v0.45.1-<platform>` from the [NET release](https://github.com/ai-2070/net/releases/tag/v0.45.1) (x86_64 Linux and Windows), or build it with `cargo install net-cli --features rtc-bootstrap`. Put it at `.anchor/bin/net-mesh(.exe)`, or set `NET_MESH_BIN`. The first run fills `.anchor/` with the mesh key, the credential issuer key and the certificate. It's git-ignored; keep it private.
 
 Other options:
 - `npm start -- --host <LAN IP>`: play across your LAN. Other machines must trust your mkcert CA.
@@ -55,6 +71,9 @@ three.js and NET are pinned npm dependencies (Renovate keeps them current); only
 - **Solo:** a walled arena with crates and cover, plus eight target dummies that patrol, take damage (headshots do double), and respawn three seconds after they go down.
 - **Menus:** main menu, mode select (Solo / Co-op), settings (player name, sensitivity, FOV, volume, saved in `localStorage`), controls, and a pause menu (Resume, Settings, Controls, Quit to main menu). Esc steps back out of sub-menus. Beside the main menu, a card on NET, in NET's own look, with links to its site and its browser quickstart.
 - **Co-op over [NET](https://ai2070.net/docs), 2–4 players:**
+
+  ![The co-op server browser: hosted games with region, map, player count and route, search and filters, and Host game / Join buttons](docs/screenshots/server-browser.png)
+
   - **Host game** opens a NET lobby with the form's settings: server name, max players (2–4), map, region tag, optional password and friendly fire. Everything but the password and friendly fire shows in the server browser; a password marks the game locked.
   - **Server browser** lists open games with NET's `listLobbies`, with columns for server, region, map, players and route. Search matches server names; the region dropdown, Hide full and Hide empty filter the list; column headers sort it; Refresh fetches it again. If NET can't be reached, the list says why and the status reads "Not connected to NET".
   - **Joining:** select a row, then Join (or double-click, or Enter; the arrow keys move the selection). Full games can't be joined. Selecting a locked game shows a password box next to Join, and the host checks the password.
@@ -155,6 +174,8 @@ js/netrain.js       the NET card's packet rain, beside the main menu
 
 scripts/build.mjs   npm run build: the game into dist/
 scripts/dev.mjs     npm start: build and watch, HTTPS page server, optional local NET anchor
+
+docs/               README screenshots and the social preview image
 ```
 
 ## License
